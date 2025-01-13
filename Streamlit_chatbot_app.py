@@ -25,7 +25,8 @@ def generate_summary_report():
     return rows
 
 # Streamlit Sidebar
-st.sidebar.image("/mnt/data/image (5).png", use_container_width=True)  # Updated with the provided logo path
+# Sidebar with the logo
+st.sidebar.image("Mini DesktopBuddha Logo.png", use_container_width=True)
 st.sidebar.title("DesktopBuddha")
 st.sidebar.subheader("Select a category")
 category = st.sidebar.radio("", ["Personal Transformation", "Relationships", "Career Growth"])
