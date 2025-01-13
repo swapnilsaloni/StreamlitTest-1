@@ -24,23 +24,22 @@ def generate_summary_report():
     conn.close()
     return rows
 
-# Streamlit UI
-# Add a logo at the top
-st.image("https://via.placeholder.com/150", width=150)  # Replace with your logo URL
+# Streamlit Sidebar
+st.sidebar.image("Desktop_Buddha_Logo.png", use_column_width=True)  # Replace with actual path to the logo
+st.sidebar.title("DesktopBuddha")
+st.sidebar.subheader("Select a category")
+category = st.sidebar.radio("", ["Personal Transformation", "Relationships", "Career Growth"])
 
-# Update title and subtitle
-st.title("Desktop Buddha")
-st.subheader("A personal transformation tool")
+# Streamlit Main Section
+st.title("DesktopBuddha")
+st.write("Hello! How can we assist you today?")
 
-# Add a label and text input for choosing help options
-st.text("Please choose an option that you need help with:")
-
-# Arrange the three buttons horizontally
+# Arrange the three boxes horizontally
 col1, col2, col3 = st.columns(3)
 
 with col1:
     if st.button("Personal Transformation"):
-        user_query = st.text_input("Describe your personal transformation query:")
+        user_query = st.text_input("Please describe your personal transformation query:")
         if user_query:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -51,7 +50,7 @@ with col1:
 
 with col2:
     if st.button("Relationships"):
-        user_query = st.text_input("Describe your relationship query:")
+        user_query = st.text_input("Please describe your relationship query:")
         if user_query:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -62,7 +61,7 @@ with col2:
 
 with col3:
     if st.button("Career Growth"):
-        user_query = st.text_input("Describe your career growth query:")
+        user_query = st.text_input("Please describe your career growth query:")
         if user_query:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -70,3 +69,6 @@ with col3:
             )
             answer = response['choices'][0]['message']['content']
             st.write(f"Answer: {answer}")
+
+# Input box at the bottom
+st.text_input("Please select one of the categories and then proceed")
