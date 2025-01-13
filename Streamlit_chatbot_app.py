@@ -25,31 +25,48 @@ def generate_summary_report():
     return rows
 
 # Streamlit UI
-st.title("Simple Chatbot with Streamlit")
-st.text_input("Enter your User ID", key="userid")
-user_query = st.text_input("Ask a Yes/No question")
+# Add a logo at the top
+st.image("https://via.placeholder.com/150", width=150)  # Replace with your logo URL
 
-# Handle CrewAI Request
-if st.button("Ask CrewAI"):
-    crewai_response = requests.get(f"https://api.crewai.com/ask?question={user_query}")
-    crewai_answer = crewai_response.json().get("answer", "No response available")
+# Update title and subtitle
+st.title("Desktop Buddha")
+st.subheader("A personal transformation tool")
 
-    # Display CrewAI response
-    st.write(f"CrewAI Answer: {crewai_answer}")
-    save_to_database(st.session_state.userid, user_query, crewai_answer)
+# Add a label and text input for choosing help options
+st.text("Please choose an option that you need help with:")
 
-# Handle OpenAI Chat
-if st.button("Ask OpenAI"):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": user_query}]
-    )
-    openai_answer = response['choices'][0]['message']['content']
-    st.write(f"OpenAI Answer: {openai_answer}")
-    save_to_database(st.session_state.userid, user_query, openai_answer)
+# Arrange the three buttons horizontally
+col1, col2, col3 = st.columns(3)
 
-# Generate Summary Report
-if st.button("Generate Summary Report"):
-    report = generate_summary_report()
-    for entry in report:
-        st.write(f"User ID: {entry[0]} | Question: {entry[1]} | Answer: {entry[2]}")
+with col1:
+    if st.button("Personal Transformation"):
+        user_query = st.text_input("Describe your personal transformation query:")
+        if user_query:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": user_query}]
+            )
+            answer = response['choices'][0]['message']['content']
+            st.write(f"Answer: {answer}")
+
+with col2:
+    if st.button("Relationships"):
+        user_query = st.text_input("Describe your relationship query:")
+        if user_query:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": user_query}]
+            )
+            answer = response['choices'][0]['message']['content']
+            st.write(f"Answer: {answer}")
+
+with col3:
+    if st.button("Career Growth"):
+        user_query = st.text_input("Describe your career growth query:")
+        if user_query:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": user_query}]
+            )
+            answer = response['choices'][0]['message']['content']
+            st.write(f"Answer: {answer}")
