@@ -32,8 +32,9 @@ def personal_transformation_questions():
 
         # Button to submit response and move to the next question
         if st.button("Submit", key=f"submit_{st.session_state.question_index}"):
-            if response or response == 0:
+            if "last_response" not in st.session_state or st.session_state.last_response != response:
                 st.session_state.responses.append(response)
+                st.session_state.last_response = response
                 st.session_state.question_index += 1
 
     # If all questions are answered, redirect to summary page
