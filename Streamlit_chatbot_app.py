@@ -35,19 +35,30 @@ def personal_transformation_questions():
             if response or response == 0:
                 st.session_state.responses.append(response)
                 st.session_state.question_index += 1
+                st.experimental_rerun()
 
-    # If all questions are answered, display summary and analysis
-    if st.session_state.question_index == len(questions):
-        st.write("Thank you for completing the questions!")
-        st.write("Your responses:")
+    # If all questions are answered, redirect to summary page
+    elif st.session_state.question_index == len(questions):
+        show_summary_and_analysis()
 
-        for i, res in enumerate(st.session_state.responses):
-            st.write(f"Q{i+1}: {questions[i]['text']} - Your answer: {res}")
+# Function to display summary and reflection report
+def show_summary_and_analysis():
+    st.write("Thank you for completing the questions!")
+    st.write("### Your Responses:")
 
-        # Analyze and reflect on responses
-        analysis = analyze_responses(st.session_state.responses)
-        st.write("\n### Reflection Report")
-        st.write(analysis)
+    questions = [
+        "How confident are you in your abilities? (1-Not confident at all to 5-Extremely confident)",
+        "What strengths do you believe you possess?",
+        "How often do you compare yourself to others? (1-Never to 5-Always)"
+    ]
+
+    for i, res in enumerate(st.session_state.responses):
+        st.write(f"Q{i+1}: {questions[i]} - Your answer: {res}")
+
+    # Analyze and reflect on responses
+    analysis = analyze_responses(st.session_state.responses)
+    st.write("\n### Reflection Report")
+    st.write(analysis)
 
 # Function to analyze user responses and generate a reflection report
 def analyze_responses(responses):
@@ -71,11 +82,11 @@ def analyze_responses(responses):
     else:
         comparison_analysis = "Frequent comparisons might affect your self-esteem. Practice self-compassion and celebrate your unique journey."
 
-    # Create reflection summary
+    # Create reflection summary with bullet points
     reflection_report = (
-        f"**Confidence Analysis:** {confidence_analysis}\n"
-        f"**Your Strengths:** {strengths}\n"
-        f"**Comparison Tendency Analysis:** {comparison_analysis}"
+        f"- **Confidence Analysis:** {confidence_analysis}\n"
+        f"- **Your Strengths:** {strengths}\n"
+        f"- **Comparison Tendency Analysis:** {comparison_analysis}"
     )
 
     return reflection_report
