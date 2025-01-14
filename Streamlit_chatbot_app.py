@@ -51,8 +51,24 @@ category = st.sidebar.radio("", ["Personal Transformation", "Relationships", "Ca
 st.title("DesktopBuddha")
 st.write("Hello! How can we assist you today?")
 
+# Arrange the three boxes horizontally
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    if st.button("Personal Transformation"):
+        st.session_state.category_selected = "Personal Transformation"
+
+with col2:
+    if st.button("Relationships"):
+        st.session_state.category_selected = "Relationships"
+
+with col3:
+    if st.button("Career Growth"):
+        st.session_state.category_selected = "Career Growth"
+
 # Conditional flow based on category selection
-if category == "Personal Transformation":
-    personal_transformation_questions()
-else:
-    st.write(f"You selected {category}. Please proceed with your queries.")
+if "category_selected" in st.session_state:
+    if st.session_state.category_selected == "Personal Transformation":
+        personal_transformation_questions()
+    else:
+        st.write(f"You selected {st.session_state.category_selected}. Please proceed with your queries.")
