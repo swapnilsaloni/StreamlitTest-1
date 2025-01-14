@@ -5,7 +5,7 @@ import openai
 openai.api_key = "your_openai_api_key"
 
 # Function to handle sequential questions
-def personal_growth_questions():
+def personal_transformation_questions():
     # Initialize session state variables for the question flow
     if "question_index" not in st.session_state:
         st.session_state.question_index = 0
@@ -45,14 +45,14 @@ def personal_growth_questions():
 st.sidebar.image("Mini DesktopBuddha Logo.png", use_container_width=True)
 st.sidebar.title("DesktopBuddha")
 st.sidebar.subheader("Select a category")
-category = st.sidebar.radio("", ["Personal Growth", "Relationships", "Career Growth"])
+category = st.sidebar.radio("", ["Personal Transformation", "Relationships", "Career Growth"])
 
 # Main Section Title
 st.title("DesktopBuddha")
 st.write("Hello! How can we assist you today?")
 
 # Conditional flow based on category selection
-if category == "Personal Growth":
-    personal_growth_questions()
+if category == "Personal Transformation":
+    personal_transformation_questions()
 else:
     st.write(f"You selected {category}. Please proceed with your queries.")
