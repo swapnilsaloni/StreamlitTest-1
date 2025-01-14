@@ -20,26 +20,65 @@ def personal_transformation_questions():
     ]
 
     # Show the current question
-    current_question = questions[st.session_state.question_index]
-    st.write(current_question["text"])
+    if st.session_state.question_index < len(questions):
+        current_question = questions[st.session_state.question_index]
+        st.write(current_question["text"])
 
-    # Capture user response
-    if current_question["type"] == "objective":
-        response = st.slider("", 1, 5)
-    else:
-        response = st.text_input("Your response:")
+        # Capture user response
+        if current_question["type"] == "objective":
+            response = st.slider("", 1, 5)
+        else:
+            response = st.text_input("Your response:")
 
-    # Button to submit response and move to the next question
-    if st.button("Submit"):
-        if response:
-            st.session_state.responses.append(response)
-            if st.session_state.question_index < len(questions) - 1:
+        # Button to submit response and move to the next question
+        if st.button("Submit"):
+            if response or response == 0:
+                st.session_state.responses.append(response)
                 st.session_state.question_index += 1
-            else:
-                st.write("Thank you for completing the questions!")
-                st.write("Your responses:")
-                for i, res in enumerate(st.session_state.responses):
-                    st.write(f"Q{i+1}: {questions[i]['text']} - Your answer: {res}")
+
+    # If all questions are answered, display summary and analysis
+    if st.session_state.question_index == len(questions):
+        st.write("Thank you for completing the questions!")
+        st.write("Your responses:")
+
+        for i, res in enumerate(st.session_state.responses):
+            st.write(f"Q{i+1}: {questions[i]['text']} - Your answer: {res}")
+
+        # Analyze and reflect on responses
+        analysis = analyze_responses(st.session_state.responses)
+        st.write("\n### Reflection Report")
+        st.write(analysis)
+
+# Function to analyze user responses and generate a reflection report
+def analyze_responses(responses):
+    confidence_level = responses[0]
+    strengths = responses[1]
+    comparison_level = responses[2]
+
+    # Analyze confidence
+    if confidence_level <= 2:
+        confidence_analysis = "You may have some doubts about your abilities. Building small successes can help improve confidence."
+    elif confidence_level <= 4:
+        confidence_analysis = "You seem moderately confident. Recognizing your achievements can further strengthen this."
+    else:
+        confidence_analysis = "You have strong self-confidence. Keep leveraging this strength while staying open to growth."
+
+    # Analyze comparison tendency
+    if comparison_level <= 2:
+        comparison_analysis = "You rarely compare yourself to others, which indicates strong self-assurance and focus."
+    elif comparison_level <= 4:
+        comparison_analysis = "You occasionally compare yourself to others. Try focusing on personal growth instead of external benchmarks."
+    else:
+        comparison_analysis = "Frequent comparisons might affect your self-esteem. Practice self-compassion and celebrate your unique journey."
+
+    # Create reflection summary
+    reflection_report = (
+        f"**Confidence Analysis:** {confidence_analysis}\n"
+        f"**Your Strengths:** {strengths}\n"
+        f"**Comparison Tendency Analysis:** {comparison_analysis}"
+    )
+
+    return reflection_report
 
 # Streamlit Sidebar
 st.sidebar.image("Mini DesktopBuddha Logo.png", use_container_width=True)
