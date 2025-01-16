@@ -1,8 +1,15 @@
 import streamlit as st
 import openai
 
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
 # OpenAI API Key
-openai.api_key = "your_openai_api_key"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 
 # Function to handle sequential questions
 def personal_transformation_questions():
@@ -32,9 +39,8 @@ def personal_transformation_questions():
 
         # Button to submit response and move to the next question
         if st.button("Submit", key=f"submit_{st.session_state.question_index}"):
-            if "last_response" not in st.session_state or st.session_state.last_response != response:
+            if response or response == 0:
                 st.session_state.responses.append(response)
-                st.session_state.last_response = response
                 st.session_state.question_index += 1
 
     # If all questions are answered, redirect to summary page
