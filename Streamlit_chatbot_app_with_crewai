@@ -1,0 +1,103 @@
+import os
+import streamlit as st
+from crewai import Crew, Process, Agent, Task
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access the OpenAI API key
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if not openai_api_key:
+    raise ValueError("The OpenAI API key is missing! Please check your .env file.")
+
+# Initialize the OpenAI model for CrewAI
+openai = ChatOpenAI(model="gpt-4o-mini", temperature=0.5)
+
+# Custom Handler for CrewAI interactions
+class CustomHandler(BaseCallbackHandler):
+    def __init__(self, agent_name: str) -> None:
+        super().__init__()
+        self.agent_name = agent_name
+
+    def on_chain_start(self, serialized, outputs, **kwargs):
+        st.session_state.messages.append({"role": "assistant", "content": outputs['input']})
+        st.chat_message("assistant").write(outputs['input'])
+
+    def on_agent_action(self, serialized, inputs, **kwargs):
+        st.session_state.messages.append({"role": "assistant", "content": inputs['input']})
+        st.chat_message("assistant").write(inputs['input'])
+
+    def on_chain_end(self, outputs, **kwargs):
+        st.session_state.messages.append({"role": self.agent_name, "content": outputs['output']})
+        st.chat_message(self.agent_name).write(outputs['output'])
+
+# Define agents
+project_manager = Agent(
+    role='Project Manager',
+    backstory='You break down tasks for the team.',
+    goal='Generate actionable steps for task completion.',
+    llm=openai,
+    callbacks=[CustomHandler("Project Manager")],
+)
+
+coder = Agent(
+    role='Python Coder',
+    backstory='You write high-quality Python code.',
+    goal='Develop well-structured, feature-complete Python code.',
+    llm=openai,
+    callbacks=[CustomHandler("Coder")],
+)
+
+# Streamlit App for DesktopBuddha with CrewAI Integration
+st.sidebar.image("Mini DesktopBuddha Logo.png", use_container_width=True)
+st.sidebar.title("DesktopBuddha")
+st.sidebar.subheader("Select a category")
+category = st.sidebar.radio("", ["Personal Transformation", "Relationships", "Career Growth", "CrewAI Assistance"])
+
+st.title("DesktopBuddha")
+st.write("Hello! How can we assist you today?")
+
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []
+
+if category == "CrewAI Assistance":
+    st.write("### CrewAI Coding Studio")
+    for msg in st.session_state.messages:
+        st.chat_message(msg["role"]).write(msg["content"])
+
+    if prompt := st.chat_input("Enter your task description:"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.chat_message("user").write(prompt)
+
+        # Define tasks
+        task_plan = Task(
+            description=f"Create a plan for the task: '{prompt}'.",
+            agent=project_manager,
+            expected_output="Detailed task plan."
+        )
+
+        task_code = Task(
+            description="Write clean, efficient Python code.",
+            agent=coder,
+            expected_output="Well-structured, feature-complete Python code."
+        )
+
+        # Create Crew and process tasks
+        project_crew = Crew(
+            tasks=[task_plan, task_code],
+            agents=[project_manager, coder],
+            process=Process.hierarchical,
+            manager_llm=openai,
+            manager_callbacks=[CustomHandler("Crew Manager")]
+        )
+        final_result = project_crew.kickoff()
+
+        # Display the result
+        result = f"## Final Output:\n\n{final_result}"
+        st.session_state.messages.append({"role": "assistant", "content": result})
+        st.chat_message("assistant").write(result)
+else:
+    st.write(f"You selected {category}. Please proceed with your queries.")
